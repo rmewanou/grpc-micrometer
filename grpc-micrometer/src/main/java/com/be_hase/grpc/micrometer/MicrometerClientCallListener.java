@@ -12,28 +12,46 @@ class MicrometerClientCallListener<RespT>
     private final GrpcMetrics grpcMetrics;
     private final GrpcMethod grpcMethod;
     private final long start;
+    private final Metadata headers;
+    private final boolean dynamicTags;
 
     MicrometerClientCallListener(Listener<RespT> delegate,
                                  GrpcMetrics grpcMetrics,
                                  GrpcMethod grpcMethod) {
+        this(delegate, grpcMetrics, grpcMethod, null, null);
+    }
+    MicrometerClientCallListener(Listener<RespT> delegate,
+                                 GrpcMetrics grpcMetrics,
+                                 GrpcMethod grpcMethod,
+                                 Metadata headers) {
+        this(delegate, grpcMetrics, grpcMethod, headers, null);
+    }
+
+    MicrometerClientCallListener(Listener<RespT> delegate,
+                                 GrpcMetrics grpcMetrics,
+                                 GrpcMethod grpcMethod,
+                                 Metadata headers,
+                                 Boolean dynamicTags) {
         super(delegate);
 
         this.grpcMetrics = grpcMetrics;
         this.grpcMethod = grpcMethod;
+        this.headers = headers;
+        this.dynamicTags = dynamicTags != null && dynamicTags;
         start = System.nanoTime();
     }
 
     @Override
     public void onClose(Status status, Metadata trailers) {
         super.onClose(status, trailers);
-        grpcMetrics.recordLatency(status, System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        grpcMetrics.recordLatency(status, trailers,System.nanoTime() - start, TimeUnit.NANOSECONDS);
     }
 
     @Override
     public void onMessage(RespT message) {
         super.onMessage(message);
         if (grpcMethod.isStreamsResponses()) {
-            grpcMetrics.incrementStreamMessagesReceived();
+            grpcMetrics.incrementStreamMessagesReceived(headers);
         }
     }
 }

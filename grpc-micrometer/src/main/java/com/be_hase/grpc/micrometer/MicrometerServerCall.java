@@ -26,7 +26,7 @@ class MicrometerServerCall<ReqT, RespT>
     @Override
     public void close(Status status, Metadata trailers) {
         super.close(status, trailers);
-        grpcMetrics.recordLatency(status, System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        grpcMetrics.recordLatency(status, trailers,System.nanoTime() - start, TimeUnit.NANOSECONDS);
     }
 
     @Override

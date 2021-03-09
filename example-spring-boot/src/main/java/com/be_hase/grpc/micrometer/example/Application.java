@@ -37,7 +37,7 @@ public class Application {
 
         return HelloServiceGrpc
                 .newBlockingStub(channel)
-                .withInterceptors(new MicrometerClientInterceptor(Metrics.globalRegistry, configure));
+                .withInterceptors(new MicrometerClientInterceptor(Metrics.globalRegistry, configure, null));
     }
 
     @Bean
@@ -49,6 +49,6 @@ public class Application {
                                         builder.publishPercentiles(0.5, 0.75, 0.95, 0.99);
                                     });
 
-        return new MicrometerServerInterceptor(meterRegistry, configure);
+        return new MicrometerServerInterceptor(meterRegistry, configure, null);
     }
 }

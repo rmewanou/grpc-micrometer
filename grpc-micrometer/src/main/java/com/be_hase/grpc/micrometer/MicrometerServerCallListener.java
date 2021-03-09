@@ -21,7 +21,7 @@ class MicrometerServerCallListener<ReqT>
     public void onMessage(ReqT message) {
         super.onMessage(message);
         if (grpcMethod.isStreamsRequests()) {
-            grpcMetrics.incrementStreamMessagesReceived();
+            grpcMetrics.incrementStreamMessagesReceived(null);
         }
     }
 }
